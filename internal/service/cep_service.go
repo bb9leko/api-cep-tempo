@@ -1,13 +1,22 @@
 package service
 
 import (
-	"errors"
 	"math"
 	"regexp"
 
 	"github.com/bb9leko/api-cep-tempo/internal/client"
 	"github.com/bb9leko/api-cep-tempo/internal/model"
 )
+
+// ServiceError representa um erro customizado com código HTTP e mensagem
+type ServiceError struct {
+	Code    int
+	Message string
+}
+
+func (e *ServiceError) Error() string {
+	return e.Message
+}
 
 func IsValidCEP(cep string) bool {
 	re := regexp.MustCompile(`^\d{8}$`)
@@ -16,14 +25,14 @@ func IsValidCEP(cep string) bool {
 
 func GetCEPAndTempoInfo(cep string) (*model.CEPTempoResponse, error) {
 	if !IsValidCEP(cep) {
-		return nil, errors.New("CEP inválido. Deve conter 8 números.")
+		return nil, &ServiceError{Code: 422, Message: "invalid zipcode"}
 	}
 	data, err := client.FetchCEP(cep)
 	if err != nil {
-		return nil, err
+		return nil, &ServiceError{Code: 500, Message: "internal error"}
 	}
 	if data.Erro {
-		return nil, errors.New("CEP não encontrado.")
+		return nil, &ServiceError{Code: 404, Message: "can not find zipcode"}
 	}
 
 	// Consulta a WeatherAPI usando a localidade retornada

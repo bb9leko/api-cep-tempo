@@ -3,7 +3,6 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
-	"strings"
 
 	"github.com/bb9leko/api-cep-tempo/internal/service"
 )
@@ -22,18 +21,11 @@ func CEPHandler(w http.ResponseWriter, r *http.Request) {
 	cep := r.URL.Query().Get("cep")
 	data, err := service.GetCEPAndTempoInfo(cep)
 	if err != nil {
-		var code int
-		var msg string
-		switch {
-		case strings.Contains(err.Error(), "CEP inválido"):
-			code = http.StatusUnprocessableEntity
-			msg = "invalid zipcode"
-		case strings.Contains(err.Error(), "CEP não encontrado"):
-			code = http.StatusNotFound
-			msg = "can not find zipcode"
-		default:
-			code = http.StatusInternalServerError
-			msg = "internal error"
+		code := 500
+		msg := "internal error"
+		if serr, ok := err.(*service.ServiceError); ok {
+			code = serr.Code
+			msg = serr.Message
 		}
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(code)

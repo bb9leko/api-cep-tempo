@@ -7,5 +7,5 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /app/api-cep-tempo
 FROM alpine
 WORKDIR /app
 COPY --from=build /app/api-cep-tempo .
-#COPY ./static ./static
+COPY ./static ./static
 ENTRYPOINT ["./api-cep-tempo"]
