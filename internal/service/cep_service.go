@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"math"
 	"regexp"
 
 	"github.com/bb9leko/api-cep-tempo/internal/client"
@@ -31,11 +32,21 @@ func GetCEPAndTempoInfo(cep string) (*model.CEPTempoResponse, error) {
 		return nil, err
 	}
 
+	tempF := tempC*1.8 + 32 // Fahrenheit
+	tempK := tempC + 273    // Kelvin (conforme solicitado, sem casas decimais)
+
+	// Arredonda para 1 casa decimal
+	tempC = math.Round(tempC*10) / 10
+	tempF = math.Round(tempF*10) / 10
+	tempK = math.Round(tempK*10) / 10
+
 	return &model.CEPTempoResponse{
 		Cep:        data.Cep,
 		Localidade: data.Localidade,
 		Temperatura: model.TempoResponse{
-			Celsius: tempC,
+			Celsius:    tempC,
+			Fahrenheit: tempF,
+			Kelvin:     tempK,
 		},
 	}, nil
 }

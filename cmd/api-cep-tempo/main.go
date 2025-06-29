@@ -18,6 +18,9 @@ func main() {
 
 	// Disponibiliza a chave para o restante do sistema via variável de ambiente
 	os.Setenv("WEATHERAPI_KEY", cfg.WeatherAPIKey)
+	fmt.Println("WEATHERAPI_KEY carregada:", cfg.WeatherAPIKey)
+
+	http.Handle("/", http.FileServer(http.Dir("./static")))
 
 	http.HandleFunc("/cep", handler.CEPHandler)
 	port := os.Getenv("PORT")
