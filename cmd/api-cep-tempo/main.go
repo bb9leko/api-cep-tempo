@@ -6,19 +6,25 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/bb9leko/api-cep-tempo/configs"
 	"github.com/bb9leko/api-cep-tempo/internal/handler"
 )
 
 func main() {
-	cfg, err := configs.LoadConfig()
-	if err != nil {
-		log.Fatalf("Erro ao carregar configuração: %v", err)
+
+	apiKey := os.Getenv("WEATHERAPI_KEY")
+	if apiKey == "" {
+		log.Fatal("WEATHERAPI_KEY não configurada")
 	}
+	fmt.Println("WEATHERAPI_KEY carregada:", apiKey)
+
+	//cfg, err := configs.LoadConfig()
+	//if err != nil {
+	//	log.Fatalf("Erro ao carregar configuração: %v", err)
+	//}
 
 	// Disponibiliza a chave para o restante do sistema via variável de ambiente
-	os.Setenv("WEATHERAPI_KEY", cfg.WeatherAPIKey)
-	fmt.Println("WEATHERAPI_KEY carregada:", cfg.WeatherAPIKey)
+	//os.Setenv("WEATHERAPI_KEY", cfg.WeatherAPIKey)
+	//fmt.Println("WEATHERAPI_KEY carregada:", cfg.WeatherAPIKey)
 
 	http.Handle("/", http.FileServer(http.Dir("./static")))
 
