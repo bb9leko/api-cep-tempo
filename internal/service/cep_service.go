@@ -28,7 +28,7 @@ func GetCEPAndTempoInfo(cep string) (*model.CEPTempoResponse, error) {
 		return nil, &ServiceError{Code: 422, Message: "invalid zipcode"}
 	}
 	data, err := client.FetchCEP(cep)
-	if data.Erro {
+	if err != nil {
 		return nil, &ServiceError{Code: 404, Message: "can not find zipcode"}
 	}
 
